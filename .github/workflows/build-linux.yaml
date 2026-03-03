@@ -1,6 +1,6 @@
 name: build_linux
 
-on: [push, pull_request]
+on: workflow_dispatch
 
 jobs:
   Test:
@@ -18,7 +18,7 @@ jobs:
           profile: minimal
           toolchain: ${{ matrix.rust }}
           override: true
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
@@ -43,7 +43,7 @@ jobs:
           mv src-tauri/target/release/bundle/appimage/*.AppImage ./taurapp_amd64.AppImage
           mv src-tauri/target/release/bundle/deb/*.deb ./taurapp_amd64.deb
       - name: "Upload Build"
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: taurapp_amd64_linux
           path: taurapp_amd64_linux
