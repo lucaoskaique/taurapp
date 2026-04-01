@@ -7,6 +7,7 @@
 pub mod api_client;
 pub mod bot;
 pub mod logging;
+pub mod memory;
 pub mod tray;
 pub mod whatsapp;
 pub mod window;

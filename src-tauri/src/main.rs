@@ -9,7 +9,7 @@
     windows_subsystem = "windows"
 )]
 
-use app::{logging, tray, window};
+use app::{logging, memory, tray, window};
 
 fn main() {
     logging::setup_logger().expect("Could not set up loggers.");
@@ -22,6 +22,17 @@ fn main() {
 
             // Setup window event handlers
             window::setup_window_handlers(app.handle());
+
+            // Clear cache on startup
+            memory::clear_webview_cache(app.handle());
+
+            // Start memory monitoring
+            memory::start_memory_monitor(app.handle().clone());
+
+            // Start periodic webview refresh
+            memory::start_webview_refresh(app.handle().clone());
+
+            log::info!("Memory management initialized");
 
             Ok(())
         })
