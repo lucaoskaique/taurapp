@@ -37,6 +37,9 @@ pub fn start_memory_monitor(_app_handle: AppHandle) {
 }
 
 /// Refresh webview periodically to clear memory
+/// NOTE: Disabled for WhatsApp Web as it causes disconnection issues
+/// WhatsApp Web manages its own memory efficiently
+#[allow(dead_code)]
 pub fn start_webview_refresh(app_handle: AppHandle) {
     std::thread::spawn(move || {
         let rt = tokio::runtime::Runtime::new().unwrap();
@@ -63,26 +66,27 @@ pub fn start_webview_refresh(app_handle: AppHandle) {
 }
 
 /// Clear webview cache on startup
+/// NOTE: For WhatsApp Web, we don't clear localStorage to preserve session data
 pub fn clear_webview_cache(app_handle: &AppHandle) {
-    log::info!("Clearing webview cache...");
+    log::info!("Clearing temporary webview data...");
     
-    // Clear cookies and cache using webview2 on Windows
+    // For WhatsApp Web, we only clear sessionStorage, not localStorage
+    // This preserves the WhatsApp session and prevents disconnection
     if let Some(window) = app_handle.get_webview_window("main") {
-        // Evaluate JavaScript to clear localStorage and sessionStorage
+        // Only clear sessionStorage, keep localStorage for WhatsApp session persistence
         let clear_storage = r#"
             try {
-                localStorage.clear();
                 sessionStorage.clear();
-                console.log('Storage cleared');
+                console.log('Session storage cleared');
             } catch(e) {
-                console.error('Error clearing storage:', e);
+                console.error('Error clearing session storage:', e);
             }
         "#;
         
         if let Err(e) = window.eval(clear_storage) {
-            log::error!("Failed to clear storage: {}", e);
+            log::error!("Failed to clear session storage: {}", e);
         } else {
-            log::info!("Storage cleared successfully");
+            log::info!("Session storage cleared successfully");
         }
     }
 }
